@@ -16,11 +16,12 @@ from typing import Dict, List, Tuple, Optional
 
 
 class GitAnalytics:
-    def __init__(self, repo_path: str = ".", start_date: str = None, end_date: str = None):
+    def __init__(self, repo_path: str = ".", start_date: str = None, end_date: str = None, github_username: str = None):
         self.repo_path = repo_path
         self.username = None
         self.start_date = start_date
         self.end_date = end_date
+        self.github_username = github_username
         
     def _build_date_filter(self) -> List[str]:
         """Build date filter arguments for git commands"""
@@ -254,6 +255,11 @@ class GitAnalytics:
             'source': 'unknown'
         }
         
+        # Use GitHub username if provided, otherwise use the regular username
+        pr_username = self.github_username if self.github_username else username
+        if self.github_username:
+            print(f"Using GitHub username '{pr_username}' for PR counting...")
+        
         # Try GitHub CLI
         try:
             # Check if GitHub CLI is authenticated
@@ -264,7 +270,7 @@ class GitAnalytics:
             )
             if auth_check.returncode == 0:
                 result = subprocess.run(
-                    ['gh', 'pr', 'list', '--author', username, '--json', 'number'],
+                    ['gh', 'pr', 'list', '--author', pr_username, '--json', 'number'],
                     capture_output=True,
                     text=True,
                     check=True
@@ -281,7 +287,7 @@ class GitAnalytics:
         # Try GitLab CLI
         try:
             result = subprocess.run(
-                ['glab', 'mr', 'list', '--author', username, '--json', 'id'],
+                ['glab', 'mr', 'list', '--author', pr_username, '--json', 'id'],
                 capture_output=True,
                 text=True,
                 check=True
@@ -299,7 +305,7 @@ class GitAnalytics:
             if 'github.com' in remote_url:
                 # Extract repo name from URL
                 repo_name = remote_url.split('github.com/')[-1].replace('.git', '')
-                url = f"https://api.github.com/search/issues?q=author:{username}+repo:{repo_name}+is:pr"
+                url = f"https://api.github.com/search/issues?q=author:{pr_username}+repo:{repo_name}+is:pr"
                 
                 # Add authentication headers if token is available
                 headers = {}
@@ -462,6 +468,7 @@ class GitAnalytics:
 def main():
     parser = argparse.ArgumentParser(description='Git Analytics Tool')
     parser.add_argument('username', help='Git username to analyze')
+    parser.add_argument('--github-username', help='GitHub username for PR counting (different from Git author name)')
     parser.add_argument('--repo', default='.', help='Repository path (default: current directory)')
     parser.add_argument('--start-date', help='Start date filter (YYYY-MM-DD format)')
     parser.add_argument('--end-date', help='End date filter (YYYY-MM-DD format)')
@@ -471,7 +478,7 @@ def main():
     
     args = parser.parse_args()
     
-    analytics = GitAnalytics(args.repo, args.start_date, args.end_date)
+    analytics = GitAnalytics(args.repo, args.start_date, args.end_date, args.github_username)
     report = analytics.generate_report(args.username, args.format)
     
     if args.output:

@@ -86,7 +86,7 @@ Net Lines: 1613
 Git Analytics Summary
 ================================
 User: Alex Panin
-Repository: ShoppingCalc
+Repository: git_stat
 Generated: 2025-08-01 14:00:58
 
 Quick Stats:
@@ -248,7 +248,6 @@ done
 ## ✅ Testing
 
 All scripts have been tested with:
-- ✅ **Real Repository Data** - ShoppingCalc project
 - ✅ **Different Usernames** - Various author formats
 - ✅ **Error Conditions** - Invalid users, non-Git directories
 - ✅ **Output Formats** - Text and JSON outputs
