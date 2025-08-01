@@ -385,6 +385,6 @@ python3 utils/git_analytics.py "username" --start-date 2024-01-01 --end-date 202
 - **API Integration** - Programmatic access to statistics
 - **Custom Reports** - Tailored analytics for specific needs
 
-### 📝 License
+
 
 This script is part of the ShoppingCalc project and follows the same license terms. 
