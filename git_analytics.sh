@@ -2,7 +2,7 @@
 
 # Git Analytics Script
 # Counts PRs, commits, and lines of code for a specific user
-# Usage: ./git_analytics.sh <username> [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]
+# Usage: ./git_analytics.sh <username> [--github-username <github_username>] [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]
 
 set -e
 
@@ -19,6 +19,7 @@ NC='\033[0m' # No Color
 START_DATE=""
 END_DATE=""
 DATE_FILTER=""
+GITHUB_USERNAME=""
 
 # Function to print colored output
 print_header() {
@@ -110,6 +111,13 @@ count_pull_requests() {
     local username="$1"
     local pr_count=0
     
+    # Use GitHub username if provided, otherwise use the regular username
+    local pr_username="$username"
+    if [ -n "$GITHUB_USERNAME" ]; then
+        pr_username="$GITHUB_USERNAME"
+        echo "Using GitHub username '$pr_username' for PR counting..."
+    fi
+    
     print_section "Counting Pull Requests..."
     
     # Try GitHub CLI if available
@@ -118,12 +126,12 @@ count_pull_requests() {
         # Check if GitHub CLI is authenticated
         if gh auth status >/dev/null 2>&1; then
             # Try to get PR count, but handle shell configuration issues
-            pr_count=$(gh pr list --author "$username" --json number --jq length 2>/dev/null 2>&1 || echo "0")
+            pr_count=$(gh pr list --author "$pr_username" --json number --jq length 2>/dev/null 2>&1 || echo "0")
             # Check if the output contains error messages from shell configuration
             if echo "$pr_count" | grep -q "head:"; then
                 echo "GitHub CLI command failed due to shell configuration. Trying alternative method..."
                 # Try a simpler approach without jq
-                pr_count=$(gh pr list --author "$username" --limit 1000 2>/dev/null | wc -l || echo "0")
+                pr_count=$(gh pr list --author "$pr_username" --limit 1000 2>/dev/null | wc -l || echo "0")
             fi
             
             # If we got a valid count, use it
@@ -132,9 +140,9 @@ count_pull_requests() {
                 return
             fi
             
-            # If we got 0, that might be correct, but let's also try with different username formats
+            # If we got 0, that might be correct
             if [ "$pr_count" = "0" ]; then
-                echo "No PRs found for '$username'. This might be correct, or the username format might be different."
+                echo "No PRs found for '$pr_username'."
                 print_result "Pull Requests: 0"
                 return
             fi
@@ -146,7 +154,7 @@ count_pull_requests() {
     # Try GitLab CLI if available
     if command_exists glab; then
         echo "Using GitLab CLI to count MRs..."
-        pr_count=$(glab mr list --author "$username" --json id --jq length 2>/dev/null || echo "0")
+        pr_count=$(glab mr list --author "$pr_username" --json id --jq length 2>/dev/null || echo "0")
         if [ "$pr_count" != "0" ] && [ "$pr_count" != "null" ]; then
             print_result "Merge Requests: $pr_count"
             return
@@ -165,7 +173,7 @@ count_pull_requests() {
             headers="-H \"Authorization: token $GITHUB_TOKEN\""
         fi
         
-        pr_count=$(eval "curl -s $headers \"https://api.github.com/search/issues?q=author:$username+repo:$repo_name+is:pr\"" | jq '.total_count' 2>/dev/null || echo "0")
+        pr_count=$(eval "curl -s $headers \"https://api.github.com/search/issues?q=author:$pr_username+repo:$repo_name+is:pr\"" | jq '.total_count' 2>/dev/null || echo "0")
         if [ "$pr_count" != "0" ] && [ "$pr_count" != "null" ] && [ "$pr_count" != "" ]; then
             print_result "Pull Requests: $pr_count"
             return
@@ -177,7 +185,7 @@ count_pull_requests() {
     echo "To enable PR counting, you can:"
     echo "1. Install and authenticate GitHub CLI: brew install gh && gh auth login"
     echo "2. Set GITHUB_TOKEN environment variable: export GITHUB_TOKEN='your_token'"
-    echo "3. Check manually at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/]*\).*/\1/' | sed 's/\.git$//')/pulls?q=author:$username"
+    echo "3. Check manually at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/]*\).*/\1/' | sed 's/\.git$//')/pulls?q=author:$pr_username"
     echo ""
     print_result "Pull Requests: Unknown"
 }
@@ -337,9 +345,14 @@ generate_summary() {
 parse_arguments() {
     local username=""
     local repo_path="."
+    local github_username=""
     
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --github-username)
+                github_username="$2"
+                shift 2
+                ;;
             --start-date)
                 START_DATE="$2"
                 shift 2
@@ -368,12 +381,12 @@ parse_arguments() {
     done
     
     if [ -z "$username" ]; then
-        print_error "Usage: $0 <username> [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]"
+        print_error "Usage: $0 <username> [--github-username <github_username>] [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]"
         echo "Use --help for more information"
         exit 1
     fi
     
-    echo "$username:$repo_path"
+    echo "$username:$repo_path:$github_username"
 }
 
 # Main function
@@ -382,6 +395,7 @@ main() {
     local args_result=$(parse_arguments "$@")
     local username=$(echo "$args_result" | cut -d':' -f1)
     local repo_path=$(echo "$args_result" | cut -d':' -f2)
+    GITHUB_USERNAME=$(echo "$args_result" | cut -d':' -f3)
     
     # Build date filter
     build_date_filter
@@ -468,19 +482,20 @@ check_dependencies() {
 # Check for help before running main
 for arg in "$@"; do
     if [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
-        echo "Usage: $0 <username> [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]"
+        echo "Usage: $0 <username> [--github-username <github_username>] [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]"
         echo ""
         echo "Options:"
+        echo "  --github-username USER   GitHub username for PR counting (different from Git author name)"
         echo "  --start-date YYYY-MM-DD  Filter commits from this date (inclusive)"
         echo "  --end-date YYYY-MM-DD    Filter commits until this date (inclusive)"
         echo "  --help, -h               Show this help message"
         echo ""
         echo "Examples:"
-        echo "  $0 john.doe"
-        echo "  $0 john.doe --start-date 2024-01-01"
-        echo "  $0 john.doe --start-date 2024-01-01 --end-date 2024-12-31"
-        echo "  $0 john.doe /path/to/repo"
-        echo "  $0 john.doe --start-date 2024-01-01 /path/to/repo"
+        echo "  $0 'Alex Panin'"
+        echo "  $0 'Alex Panin' --github-username alxp1982"
+        echo "  $0 'Alex Panin' --github-username alxp1982 --start-date 2024-01-01"
+        echo "  $0 'Alex Panin' --github-username alxp1982 --start-date 2024-01-01 --end-date 2024-12-31"
+        echo "  $0 'Alex Panin' --github-username alxp1982 /path/to/repo"
         exit 0
     fi
 done

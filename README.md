@@ -20,9 +20,10 @@ cd utils && ./quick_git_stats.sh <username>
 ### 2. Full Analytics (`git_analytics.sh`) - Comprehensive Bash Script
 ```bash
 # From repository root
-./utils/git_analytics.sh <username>
-./utils/git_analytics.sh <username> --start-date 2024-01-01
-./utils/git_analytics.sh <username> --start-date 2024-01-01 --end-date 2024-12-31
+./git_analytics.sh <username>
+./git_analytics.sh <username> --github-username <github_username>
+./git_analytics.sh <username> --start-date 2024-01-01
+./git_analytics.sh <username> --start-date 2024-01-01 --end-date 2024-12-31
 
 # From any subdirectory
 cd utils && ./git_analytics.sh <username>
@@ -31,9 +32,10 @@ cd utils && ./git_analytics.sh <username>
 ### 3. Advanced Analytics (`git_analytics.py`) - Python with JSON Output
 ```bash
 # From repository root
-python3 utils/git_analytics.py <username> --format json --output report.json
-python3 utils/git_analytics.py <username> --start-date 2024-01-01 --format json
-python3 utils/git_analytics.py <username> --start-date 2024-01-01 --end-date 2024-12-31 --format json
+python3 git_analytics.py <username> --format json --output report.json
+python3 git_analytics.py <username> --github-username <github_username> --format json
+python3 git_analytics.py <username> --start-date 2024-01-01 --format json
+python3 git_analytics.py <username> --start-date 2024-01-01 --end-date 2024-12-31 --format json
 
 # From any subdirectory
 cd utils && python3 git_analytics.py <username> --format json
@@ -52,13 +54,30 @@ A comprehensive script that analyzes Git repository statistics for a specific us
 
 ```bash
 # Basic usage (run from repository root)
-./scripts/git_analytics.sh <username>
+./git_analytics.sh <username>
 
 # Example
-./scripts/git_analytics.sh john.doe
+./git_analytics.sh "Alex Panin"
+
+# With GitHub username for PR counting
+./git_analytics.sh "Alex Panin" --github-username alxp1982
 
 # Run from different directory
-./scripts/git_analytics.sh john.doe /path/to/repo
+./git_analytics.sh "Alex Panin" /path/to/repo
+```
+
+### 🔧 GitHub Username Parameter
+
+The `--github-username` parameter allows you to specify a different GitHub username for pull request counting. This is useful when your Git commit author name differs from your GitHub username:
+
+- **Git commits** use your **display name** (e.g., "Alex Panin")
+- **GitHub pull requests** use your **GitHub username** (e.g., "alxp1982")
+
+**Example:**
+```bash
+# Commits will be counted using "Alex Panin"
+# Pull requests will be counted using "alxp1982"
+./git_analytics.sh "Alex Panin" --github-username alxp1982
 ```
 
 ### 📋 Features
@@ -268,22 +287,25 @@ Advanced Git analytics with JSON output support and enhanced data processing.
 
 ```bash
 # Basic usage
-python3 utils/git_analytics.py "john.doe"
+python3 git_analytics.py "Alex Panin"
+
+# With GitHub username for PR counting
+python3 git_analytics.py "Alex Panin" --github-username alxp1982
 
 # With date range
-python3 utils/git_analytics.py "john.doe" --start-date 2024-01-01 --end-date 2024-12-31
+python3 git_analytics.py "Alex Panin" --start-date 2024-01-01 --end-date 2024-12-31
 
 # JSON output
-python3 utils/git_analytics.py "john.doe" --format json
+python3 git_analytics.py "Alex Panin" --format json
 
-# JSON output with date range
-python3 utils/git_analytics.py "john.doe" --start-date 2024-01-01 --end-date 2024-12-31 --format json
+# JSON output with GitHub username
+python3 git_analytics.py "Alex Panin" --github-username alxp1982 --format json
 
 # Save to file
-python3 utils/git_analytics.py "john.doe" --format json --output report.json
+python3 git_analytics.py "Alex Panin" --format json --output report.json
 
 # Analyze different repository
-python3 utils/git_analytics.py "john.doe" --repo /path/to/repo
+python3 git_analytics.py "Alex Panin" --repo /path/to/repo
 ```
 
 ### Python Dependencies
@@ -384,7 +406,3 @@ python3 utils/git_analytics.py "username" --start-date 2024-01-01 --end-date 202
 - **Data Processing** - Further analysis with other tools
 - **API Integration** - Programmatic access to statistics
 - **Custom Reports** - Tailored analytics for specific needs
-
-
-
-This script is part of the ShoppingCalc project and follows the same license terms. 
