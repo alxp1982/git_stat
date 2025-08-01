@@ -491,11 +491,11 @@ for arg in "$@"; do
         echo "  --help, -h               Show this help message"
         echo ""
         echo "Examples:"
-        echo "  $0 'Alex Panin'"
-        echo "  $0 'Alex Panin' --github-username alxp1982"
-        echo "  $0 'Alex Panin' --github-username alxp1982 --start-date 2024-01-01"
-        echo "  $0 'Alex Panin' --github-username alxp1982 --start-date 2024-01-01 --end-date 2024-12-31"
-        echo "  $0 'Alex Panin' --github-username alxp1982 /path/to/repo"
+        echo "  $0 'John Doe'"
+        echo "  $0 'John Doe' --github-username johndoe"
+        echo "  $0 'John Doe' --github-username johndoe --start-date 2024-01-01"
+        echo "  $0 'John Doe' --github-username johndoe --start-date 2024-01-01 --end-date 2024-12-31"
+        echo "  $0 'John Doe' --github-username johndoe /path/to/repo"
         exit 0
     fi
 done

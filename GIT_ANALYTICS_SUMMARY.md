@@ -69,7 +69,7 @@ I've created a comprehensive suite of Git analytics scripts that count PRs, comm
 
 ### Quick Stats Output
 ```
-Quick Git Stats for: Alex Panin
+Quick Git Stats for: John Doe
 ==================================
 Total Commits: 81
 Recent Commits (30 days): 78
@@ -85,7 +85,7 @@ Net Lines: 1613
 ================================
 Git Analytics Summary
 ================================
-User: Alex Panin
+User: John Doe
 Repository: git_stat
 Generated: 2025-08-01 14:00:58
 

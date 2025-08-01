@@ -57,27 +57,27 @@ A comprehensive script that analyzes Git repository statistics for a specific us
 ./git_analytics.sh <username>
 
 # Example
-./git_analytics.sh "Alex Panin"
+./git_analytics.sh "John Doe"
 
 # With GitHub username for PR counting
-./git_analytics.sh "Alex Panin" --github-username alxp1982
+./git_analytics.sh "John Doe" --github-username johndoe
 
 # Run from different directory
-./git_analytics.sh "Alex Panin" /path/to/repo
+./git_analytics.sh "John Doe" /path/to/repo
 ```
 
 ### 🔧 GitHub Username Parameter
 
 The `--github-username` parameter allows you to specify a different GitHub username for merged pull request counting. This is useful when your Git commit author name differs from your GitHub username:
 
-- **Git commits** use your **display name** (e.g., "Alex Panin")
-- **GitHub merged pull requests** use your **GitHub username** (e.g., "alxp1982")
+- **Git commits** use your **display name** (e.g., "John Doe")
+- **GitHub merged pull requests** use your **GitHub username** (e.g., "johndoe")
 
 **Example:**
 ```bash
-# Commits will be counted using "Alex Panin"
-# Merged pull requests will be counted using "alxp1982"
-./git_analytics.sh "Alex Panin" --github-username alxp1982
+# Commits will be counted using "John Doe"
+# Merged pull requests will be counted using "johndoe"
+./git_analytics.sh "John Doe" --github-username johndoe
 ```
 
 ### 📋 Features
@@ -287,25 +287,25 @@ Advanced Git analytics with JSON output support and enhanced data processing.
 
 ```bash
 # Basic usage
-python3 git_analytics.py "Alex Panin"
+python3 git_analytics.py "John Doe"
 
 # With GitHub username for PR counting
-python3 git_analytics.py "Alex Panin" --github-username alxp1982
+python3 git_analytics.py "John Doe" --github-username johndoe
 
 # With date range
-python3 git_analytics.py "Alex Panin" --start-date 2024-01-01 --end-date 2024-12-31
+python3 git_analytics.py "John Doe" --start-date 2024-01-01 --end-date 2024-12-31
 
 # JSON output
-python3 git_analytics.py "Alex Panin" --format json
+python3 git_analytics.py "John Doe" --format json
 
 # JSON output with GitHub username
-python3 git_analytics.py "Alex Panin" --github-username alxp1982 --format json
+python3 git_analytics.py "John Doe" --github-username johndoe --format json
 
 # Save to file
-python3 git_analytics.py "Alex Panin" --format json --output report.json
+python3 git_analytics.py "John Doe" --format json --output report.json
 
 # Analyze different repository
-python3 git_analytics.py "Alex Panin" --repo /path/to/repo
+python3 git_analytics.py "John Doe" --repo /path/to/repo
 ```
 
 ### Python Dependencies
