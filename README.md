@@ -131,7 +131,7 @@ The `--github-username` parameter allows you to specify a different GitHub usern
 Git Analytics Summary
 ================================
 User: john.doe
-Repository: shopping-calc-app
+Repository: git_stat
 Generated: 2024-12-19 14:30:25
 
 Quick Stats:
@@ -331,7 +331,7 @@ Lightweight script for fast statistics overview.
 
 # From any subdirectory (scripts auto-detect Git root)
 cd utils && ./quick_git_stats.sh <username>
-cd shopping_calc_app && ../utils/quick_git_stats.sh <username>
+cd git_stat && ../utils/quick_git_stats.sh <username>
 ```
 
 ### Sample Output
