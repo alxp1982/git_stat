@@ -125,25 +125,25 @@ count_pull_requests() {
         echo "Using GitHub CLI to count PRs..."
         # Check if GitHub CLI is authenticated
         if gh auth status >/dev/null 2>&1; then
-            # Try to get PR count, but handle shell configuration issues
-            pr_count=$(gh pr list --author "$pr_username" --json number --jq length 2>/dev/null 2>&1 || echo "0")
+            # Try to get merged PR count, but handle shell configuration issues
+            pr_count=$(gh pr list --author "$pr_username" --state merged --json number --jq length 2>/dev/null 2>&1 || echo "0")
             # Check if the output contains error messages from shell configuration
             if echo "$pr_count" | grep -q "head:"; then
                 echo "GitHub CLI command failed due to shell configuration. Trying alternative method..."
                 # Try a simpler approach without jq
-                pr_count=$(gh pr list --author "$pr_username" --limit 1000 2>/dev/null | wc -l || echo "0")
+                pr_count=$(gh pr list --author "$pr_username" --state merged --limit 1000 2>/dev/null | wc -l || echo "0")
             fi
             
             # If we got a valid count, use it
             if [ "$pr_count" != "0" ] && [ "$pr_count" != "null" ] && [ "$pr_count" != "" ] && [ "$pr_count" -gt 0 ] 2>/dev/null; then
-                print_result "Pull Requests: $pr_count"
+                print_result "Merged Pull Requests: $pr_count"
                 return
             fi
             
             # If we got 0, that might be correct
             if [ "$pr_count" = "0" ]; then
-                echo "No PRs found for '$pr_username'."
-                print_result "Pull Requests: 0"
+                echo "No merged PRs found for '$pr_username'."
+                print_result "Merged Pull Requests: 0"
                 return
             fi
         else
@@ -153,10 +153,10 @@ count_pull_requests() {
     
     # Try GitLab CLI if available
     if command_exists glab; then
-        echo "Using GitLab CLI to count MRs..."
-        pr_count=$(glab mr list --author "$pr_username" --json id --jq length 2>/dev/null || echo "0")
+        echo "Using GitLab CLI to count merged MRs..."
+        pr_count=$(glab mr list --author "$pr_username" --state merged --json id --jq length 2>/dev/null || echo "0")
         if [ "$pr_count" != "0" ] && [ "$pr_count" != "null" ]; then
-            print_result "Merge Requests: $pr_count"
+            print_result "Merged Merge Requests: $pr_count"
             return
         fi
     fi
@@ -173,21 +173,21 @@ count_pull_requests() {
             headers="-H \"Authorization: token $GITHUB_TOKEN\""
         fi
         
-        pr_count=$(eval "curl -s $headers \"https://api.github.com/search/issues?q=author:$pr_username+repo:$repo_name+is:pr\"" | jq '.total_count' 2>/dev/null || echo "0")
+        pr_count=$(eval "curl -s $headers \"https://api.github.com/search/issues?q=author:$pr_username+repo:$repo_name+is:pr+is:merged\"" | jq '.total_count' 2>/dev/null || echo "0")
         if [ "$pr_count" != "0" ] && [ "$pr_count" != "null" ] && [ "$pr_count" != "" ]; then
-            print_result "Pull Requests: $pr_count"
+            print_result "Merged Pull Requests: $pr_count"
             return
         fi
     fi
     
-    print_warning "Could not determine PR count."
+    print_warning "Could not determine merged PR count."
     echo ""
-    echo "To enable PR counting, you can:"
+    echo "To enable merged PR counting, you can:"
     echo "1. Install and authenticate GitHub CLI: brew install gh && gh auth login"
     echo "2. Set GITHUB_TOKEN environment variable: export GITHUB_TOKEN='your_token'"
-    echo "3. Check manually at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/]*\).*/\1/' | sed 's/\.git$//')/pulls?q=author:$pr_username"
+    echo "3. Check manually at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/]*\).*/\1/' | sed 's/\.git$//')/pulls?q=author:$pr_username+is:merged"
     echo ""
-    print_result "Pull Requests: Unknown"
+    print_result "Merged Pull Requests: Unknown"
 }
 
 # Function to count commits across all branches
@@ -485,7 +485,7 @@ for arg in "$@"; do
         echo "Usage: $0 <username> [--github-username <github_username>] [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [repository_path]"
         echo ""
         echo "Options:"
-        echo "  --github-username USER   GitHub username for PR counting (different from Git author name)"
+        echo "  --github-username USER   GitHub username for merged PR counting (different from Git author name)"
         echo "  --start-date YYYY-MM-DD  Filter commits from this date (inclusive)"
         echo "  --end-date YYYY-MM-DD    Filter commits until this date (inclusive)"
         echo "  --help, -h               Show this help message"

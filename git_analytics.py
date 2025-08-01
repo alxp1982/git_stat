@@ -270,7 +270,7 @@ class GitAnalytics:
             )
             if auth_check.returncode == 0:
                 result = subprocess.run(
-                    ['gh', 'pr', 'list', '--author', pr_username, '--json', 'number'],
+                    ['gh', 'pr', 'list', '--author', pr_username, '--state', 'merged', '--json', 'number'],
                     capture_output=True,
                     text=True,
                     check=True
@@ -287,7 +287,7 @@ class GitAnalytics:
         # Try GitLab CLI
         try:
             result = subprocess.run(
-                ['glab', 'mr', 'list', '--author', pr_username, '--json', 'id'],
+                ['glab', 'mr', 'list', '--author', pr_username, '--state', 'merged', '--json', 'id'],
                 capture_output=True,
                 text=True,
                 check=True
@@ -305,7 +305,7 @@ class GitAnalytics:
             if 'github.com' in remote_url:
                 # Extract repo name from URL
                 repo_name = remote_url.split('github.com/')[-1].replace('.git', '')
-                url = f"https://api.github.com/search/issues?q=author:{pr_username}+repo:{repo_name}+is:pr"
+                url = f"https://api.github.com/search/issues?q=author:{pr_username}+repo:{repo_name}+is:pr+is:merged"
                 
                 # Add authentication headers if token is available
                 headers = {}
@@ -391,7 +391,7 @@ class GitAnalytics:
         report.append("")
         
         # Pull Requests
-        report.append("🔀 Pull Requests:")
+        report.append("🔀 Merged Pull Requests:")
         report.append(f"  Count: {pr_stats['pull_requests']}")
         report.append(f"  Source: {pr_stats['source']}")
         report.append("")
@@ -468,7 +468,7 @@ class GitAnalytics:
 def main():
     parser = argparse.ArgumentParser(description='Git Analytics Tool')
     parser.add_argument('username', help='Git username to analyze')
-    parser.add_argument('--github-username', help='GitHub username for PR counting (different from Git author name)')
+    parser.add_argument('--github-username', help='GitHub username for merged PR counting (different from Git author name)')
     parser.add_argument('--repo', default='.', help='Repository path (default: current directory)')
     parser.add_argument('--start-date', help='Start date filter (YYYY-MM-DD format)')
     parser.add_argument('--end-date', help='End date filter (YYYY-MM-DD format)')

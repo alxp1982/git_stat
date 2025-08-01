@@ -45,7 +45,7 @@ cd utils && python3 git_analytics.py <username> --format json
 
 A comprehensive script that analyzes Git repository statistics for a specific user, including:
 
-- **Pull Request Count** - Number of PRs/MRs created
+- **Merged Pull Request Count** - Number of merged PRs/MRs
 - **Commit Statistics** - Total commits across all branches
 - **Lines of Code** - Lines added, deleted, and net contribution
 - **Activity Analysis** - Commit patterns, time periods, and activity scores
@@ -68,21 +68,21 @@ A comprehensive script that analyzes Git repository statistics for a specific us
 
 ### 🔧 GitHub Username Parameter
 
-The `--github-username` parameter allows you to specify a different GitHub username for pull request counting. This is useful when your Git commit author name differs from your GitHub username:
+The `--github-username` parameter allows you to specify a different GitHub username for merged pull request counting. This is useful when your Git commit author name differs from your GitHub username:
 
 - **Git commits** use your **display name** (e.g., "Alex Panin")
-- **GitHub pull requests** use your **GitHub username** (e.g., "alxp1982")
+- **GitHub merged pull requests** use your **GitHub username** (e.g., "alxp1982")
 
 **Example:**
 ```bash
 # Commits will be counted using "Alex Panin"
-# Pull requests will be counted using "alxp1982"
+# Merged pull requests will be counted using "alxp1982"
 ./git_analytics.sh "Alex Panin" --github-username alxp1982
 ```
 
 ### 📋 Features
 
-#### 1. Pull Request Analysis
+#### 1. Merged Pull Request Analysis
 - **GitHub CLI Integration** - Uses `gh` command if available
 - **GitLab CLI Integration** - Uses `glab` command if available
 - **GitHub API Fallback** - Direct API calls for public repositories
@@ -220,7 +220,7 @@ done
 
 ### ⚠️ Limitations
 
-1. **PR Counting** - Requires GitHub/GitLab CLI or API access
+1. **Merged PR Counting** - Requires GitHub/GitLab CLI or API access
 2. **Private Repos** - API calls may fail for private repositories
 3. **Large Repositories** - May be slow for very large codebases
 4. **Git History** - Only analyzes current Git history (not deleted branches)
@@ -384,7 +384,7 @@ python3 utils/git_analytics.py "username" --start-date 2024-01-01 --end-date 202
 |---------|-------------|----------------|------------------|
 | Speed | ⚡ Fast | 🐌 Medium | 🐌 Medium |
 | Output Format | Text | Text | Text/JSON |
-| PR Counting | ❌ No | ✅ Yes | ✅ Yes |
+| Merged PR Counting | ❌ No | ✅ Yes | ✅ Yes |
 | File Analysis | ❌ No | ✅ Yes | ✅ Yes |
 | Dependencies | Minimal | Medium | Python + libs |
 | Export Support | ❌ No | ❌ No | ✅ Yes |

@@ -96,7 +96,7 @@ Recent Activity (30 days): 78
 Activity Score: 4710
 
 Counting Pull Requests...
-Pull Requests: 8
+Merged Pull Requests: 8
 
 Counting Commits...
 Total Commits: 81
@@ -131,7 +131,7 @@ Net Lines: 1613
 
 ## 🔍 Advanced Features
 
-### Pull Request Detection
+### Merged Pull Request Detection
 1. **GitHub CLI** (`gh`) - Primary method for GitHub repos
 2. **GitLab CLI** (`glab`) - Primary method for GitLab repos
 3. **GitHub API** - Fallback for public repositories
